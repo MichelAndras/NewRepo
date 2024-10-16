@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,8 @@ namespace Drawer
                 static int cursorY = 0;
                 static ConsoleColor currentColor = ConsoleColor.White;
                 static char currentChar = '█';
-                public static void DrawCursor()
+                static string fileName = "";
+            public static void DrawCursor()
                 {
                     Console.SetCursorPosition(cursorX, cursorY);
                     //Console.ForegroundColor = ConsoleColor.White;
@@ -123,18 +125,56 @@ namespace Drawer
                         }
                         else if (buttonKey.Key == ConsoleKey.Escape)
                         {
-                            break;
+                            Environment.Exit(0);
                         }
                     } while (true);
                 }
+            static void SaveDrawing()
+            {
+                using (StreamWriter writer = new StreamWriter(fileName))
+                {
+                    writer.WriteLine($"Cursor X: {cursorX}, Cursor Y: {cursorY}, Color: {currentColor}, Char: {currentChar}");
+                }
+            }
+            static void CreateFile()
+            {
+                Console.Clear();
+                Console.Write("Enter file name: ");
+                fileName = Console.ReadLine();
+                File.Create(fileName).Dispose();
+                Console.WriteLine("File created.");
+            }
 
-                static void ButtonHandle(int buttonIndex)
+            static void DeleteFile()
+            {
+                Console.Clear();
+                Console.Write("Enter file name: ");
+                fileName = Console.ReadLine();
+                if (File.Exists(fileName))
+                {
+                    try
+                    {
+                        File.Delete(fileName);
+                        Console.WriteLine("File deleted.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error deleting file: " + ex.Message);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("File not found.");
+                }
+            }
+            static void ButtonHandle(int buttonIndex)
                 {
                     switch (buttonIndex)
                     {
                         case 0:
-                            // Handle "Létrehozás" button click
-                            break;
+                        CreateFile();
+                        
+                        break;
                         case 1:
                             // Handle "Módosítás" button click
                             break;
@@ -142,9 +182,9 @@ namespace Drawer
                             // Handle "Törlés" button click
                             break;
                         case 3:
-                            // Handle "Kilépés" button click
-                            break;
-                    }
+                        Environment.Exit(0);
+                        break;
+                }
                 }
 
                 static void Main()
@@ -157,6 +197,7 @@ namespace Drawer
                     DrawBorder();
                     DrawButtons();
                     NavigateButtons();
+                    
                     do
                     {
                         key = Console.ReadKey(true).Key;
